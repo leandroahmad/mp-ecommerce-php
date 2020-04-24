@@ -1,8 +1,107 @@
+<?php
+
+//header("Content-Security-Policy: default-src 'self'; img-src *; media-src media1.com media2.com; script-src userscripts.example.com code.jquery.com");
+header("Content-Security-Policy: frame-ancestors 'self' https://www.mercadopago.com.ar/ *.mercadolibre.com");
+//header("X-Frame-Options: ALLOW-FROM *.mercadolibre.com");
+
+// SDK de Mercado Pago
+require __DIR__ .  '/vendor/autoload.php';
+
+$root_path = 'https://'.$_SERVER['HTTP_HOST'];
+
+// Agrega credenciales
+MercadoPago\SDK::setAccessToken('APP_USR-2663259158662105-042420-9db17e1e9c9486ac5fd5fbfdb6ffd3ff-349885057');
+
+// Crea un objeto de preferencia
+$preference = new MercadoPago\Preference();
+
+//Info del ejemplo
+$buyer = [
+    'name' => 'Lalo',
+    'surname' => 'Landa',
+    'phone' => [
+        'area_code' => '011',
+        'number' => '22223333'
+    ],
+    'identification' => [
+        'type' => 'DNI',
+        'number' => '22333444',
+    ],
+    'address' => [
+        'street_name' => 'False',
+        'street_number' => '123',
+        'zip_code' => '1111'
+    ],
+    'email' => 'test_user_63274575@testuser.com',
+];
+
+$url_imagen = $_POST['img'];
+$url_imagen = str_replace('./', '/', $url_imagen);
+$url_imagen = $root_path . $url_imagen;
+
+$producto = [
+    'id' => '1234',
+    'title' => $_POST['title'],
+    'description' => 'Dispositivo móvil de Tienda e-commerce',
+    'picture_url' => $url_imagen,
+    'currency_id' => 'ARS',
+    'quantity' => 1,
+    'unit_price' => abs($_POST['price'])
+];
+$empresa = 'Tienda e-commerce';
+$external_reference = 'ABCD1234';
+
+//Forma de pago
+//Hasta 6 cuotas
+//Sin AMEX ni ATM
+$payment_methods = [
+    'excluded_payment_methods' => [
+        ['id' => 'amex']
+    ],
+    'excluded_payment_types' => [
+        ['id' => 'atm']
+    ],
+    'installments' => 6
+];
+
+$url_success = $root_path.'/back_url.php?status=success';
+$url_pending = $root_path.'/back_url.php?status=pending';
+$url_failure = $root_path.'/back_url.php?status=failure';
+
+$back_urls = [
+    'success' => $url_success,
+    'pending' => $url_pending,
+    'failure' => $url_failure,
+];
+
+// $producto = [];
+// $producto['id'] = '1234';
+// $producto['title'] = $_POST['title'];
+// $producto['quantity'] = 1;
+// $producto['unit_price'] = abs($_POST['price']);
+// $producto['unit_price'] = 150;
+
+$preference->items = array($producto);
+$preference->buyer = $buyer;
+$preference->external_reference = $external_reference;
+$preference->payment_methods = $payment_methods;
+$preference->back_urls = $back_urls;
+$preference->auto_return = 'approved';
+$preference->notification_url = $root_path.'/notifications.php';
+$preference->save();
+
+//print_r($preference);
+//die();
+
+?>
+
+
 <!DOCTYPE html>
 <html class="supports-animation supports-columns svg no-touch no-ie no-oldie no-ios supports-backdrop-filter as-mouseuser" lang="en-US"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     
     <meta name="viewport" content="width=1024">
     <title>Tienda e-commerce</title>
+    <!-- <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self' *.mercadolibre.com *.mercadopago.com.ar"> -->
 
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="format-detection" content="telephone=no">
@@ -113,25 +212,40 @@
                                     </div>
 
                                 </div>
-                                <div class="as-producttile-info" style="float:left;min-height: 168px;">
-                                    <div class="as-producttile-titlepricewraper" style="min-height: 128px;">
-                                        <div class="as-producttile-title">
-                                            <h3 class="as-producttile-name">
-                                                <p class="as-producttile-tilelink">
-                                                    <span data-ase-truncate="2"><?php echo $_POST['title'] ?></span>
-                                                </p>
+                                    <input type="hidden" name="title" value="<?php echo $_POST['title'] ?>"/>
+                                    <input type="hidden" name="img" value="<?php echo $_POST['img'] ?>"/>
+                                    <input type="hidden" name="price" value="<?php echo $_POST['price'] ?>"/>
+                                    <input type="hidden" name="unit" value="<?php echo $_POST['unit'] ?>"/>
 
+                                    <div class="as-producttile-info" style="float:left;min-height: 168px;">
+                                        <div class="as-producttile-titlepricewraper" style="min-height: 128px;">
+                                            <div class="as-producttile-title">
+                                                <h3 class="as-producttile-name">
+                                                    <p class="as-producttile-tilelink">
+                                                        <span data-ase-truncate="2"><?php echo $_POST['title'] ?></span>
+                                                    </p>
+
+                                                </h3>
+                                            </div>
+                                            <h3 >
+                                                <?php echo $_POST['price'] ?>
+                                            </h3>
+                                            <h3 >
+                                                <?php echo "$" . $_POST['unit'] ?>
                                             </h3>
                                         </div>
-                                        <h3 >
-                                            <?php echo $_POST['price'] ?>
-                                        </h3>
-                                        <h3 >
-                                            <?php echo "$" . $_POST['unit'] ?>
-                                        </h3>
+                                        <!-- No funciona
+                                        [Report Only] Refused to display 'https://www.mercadopago.com.ar/checkout/v1/modal/05356b63-3ce7-40b4-a8d2-1a22dec91543/fatal/?preference-id=469485398-90bfaa04-6f4d-47fa-b3ff-587ca5b8860c&header-color=%232D3277&p=c9f5e266bc1ee9fc3f7d0cca2fd20498' in a frame because an ancestor violates the following Content Security Policy directive: "frame-ancestors 'self' *.mercadolibre.com". -->
+                                        <form action="/procesar-pago" method="POST">
+                                          <script
+                                           src="https://www.mercadopago.com.ar/integrations/v1/web-payment-checkout.js"
+                                           data-header-color="#2D3277"
+                                           data-button-label="Pagar la compra (modal)"
+                                           data-preference-id="<?php echo $preference->id; ?>">
+                                          </script>
+                                        </form>
+                                        <a href="<?php echo $preference->init_point; ?>" class="mercadopago-button">Pagar (redirect)</a>
                                     </div>
-                                    <button type="submit" class="mercadopago-button" formmethod="post">Pagar</button>
-                                </div>
                             </div>
                         </div>
                     </div>
