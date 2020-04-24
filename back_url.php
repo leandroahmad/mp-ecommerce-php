@@ -12,7 +12,7 @@ MercadoPago\SDK::setAccessToken('APP_USR-2663259158662105-042420-9db17e1e9c9486a
 $url = '/v1/payments/'.$_GET['collection_id'];
 $respuesta = MercadoPago\SDK::get($url);
 
-if($_GET['status'] == 'success' && $respuesta['body']['status'] == 'approved'){
+if($respuesta['body']['status'] == 'approved'){
 	echo '<p><b>Pago exitoso</b></p>';
 
 	$payment_method_id = $respuesta['body']['payment_method_id'];
@@ -31,14 +31,10 @@ if($_GET['status'] == 'success' && $respuesta['body']['status'] == 'approved'){
 
 }
 
-if($_GET['status'] == 'success' && $respuesta['body']['status'] != 'approved'){
-	echo 'Intento de fraude';
-}
-
-if($_GET['status'] == 'pending'){
+if($respuesta['body']['status'] == 'pending' || $respuesta['body']['status'] == 'in_process'){
 	echo 'Pago en proceso';
 }
 
-if($_GET['status'] == 'failure'){
+if($respuesta['body']['status'] == 'failure'){
 	echo 'Pago rechazado';
 }
