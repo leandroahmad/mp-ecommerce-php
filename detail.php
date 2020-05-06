@@ -16,7 +16,7 @@ MercadoPago\SDK::setAccessToken('APP_USR-2663259158662105-042420-9db17e1e9c9486a
 $preference = new MercadoPago\Preference();
 
 //Info del ejemplo
-$buyer = [
+$payer = (object) [
     'name' => 'Lalo',
     'surname' => 'Landa',
     'phone' => [
@@ -82,7 +82,7 @@ $back_urls = [
 // $producto['unit_price'] = 150;
 
 $preference->items = array($producto);
-$preference->buyer = $buyer;
+$preference->payer = $payer;
 $preference->external_reference = $external_reference;
 $preference->payment_methods = $payment_methods;
 $preference->back_urls = $back_urls;
