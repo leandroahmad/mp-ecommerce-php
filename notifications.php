@@ -2,7 +2,7 @@
 
 //print_r($_POST);
 require __DIR__ .  '/vendor/autoload.php';
-MercadoPago\SDK::setAccessToken('APP_USR-2663259158662105-042420-9db17e1e9c9486ac5fd5fbfdb6ffd3ff-349885057');
+MercadoPago\SDK::setAccessToken('APP_USR-6317427424180639-042414-47e969706991d3a442922b0702a0da44-469485398');
 // $url = '/v1/payments/'.$_GET['collection_id'];
 // $respuesta = MercadoPago\SDK::get($url);
 // $respuesta = $respuesta['body']['payment_method_id'];

@@ -10,7 +10,7 @@ require __DIR__ .  '/vendor/autoload.php';
 $root_path = 'https://'.$_SERVER['HTTP_HOST'];
 
 // Agrega credenciales
-MercadoPago\SDK::setAccessToken('APP_USR-2663259158662105-042420-9db17e1e9c9486ac5fd5fbfdb6ffd3ff-349885057');
+MercadoPago\SDK::setAccessToken('APP_USR-6317427424180639-042414-47e969706991d3a442922b0702a0da44-469485398');
 
 // Crea un objeto de preferencia
 $preference = new MercadoPago\Preference();
